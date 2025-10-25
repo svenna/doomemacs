@@ -1,0 +1,17 @@
+# Doom Emacs generated files
+.local/
+*.elc
+auto-save-list/
+flycheck_*.el
+
+# Emacs backup files
+*~
+\#*\#
+.\#*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Personal/private config (if needed)
+# private.el
