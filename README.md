@@ -25,13 +25,19 @@ My personal Doom Emacs configuration.
 
 **Key bindings:**
 - `SPC k c` - Open Claude command menu
-- Commands available: send region/buffer, fix errors, quick questions, etc.
+  - Commands available: send region/buffer, fix errors, quick questions, etc.
+- `SPC k m` - Monet server management
+  - `SPC k m s` - Start monet server
+  - `SPC k m k` - Stop monet server
+  - `SPC k m r` - Restart monet server
+  - `SPC k m ?` - Check server status
 
 **Usage:**
-1. Use `SPC k c` to access Claude commands in Emacs
-2. Start a monet server with `C-c m s` (or `M-x monet-start-server`)
-3. In your terminal, use `/ide` command in Claude Code to connect to Emacs
+1. Start monet server: `SPC k m s`
+2. In your terminal, run `claude` and use `/ide` command to connect to Emacs
+3. Select text in Emacs (visual mode `v` or mouse highlight)
 4. Claude can now see your selections, diagnostics, and show diffs
+5. Use `SPC k c` to send commands to Claude from Emacs
 
 ### Markdown Preview
 - **Dark theme** preview with proper contrast

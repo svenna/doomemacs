@@ -33,11 +33,16 @@
   ;; Enable monet mode for IDE protocol
   (monet-mode 1))
 
-;; Keybindings: SPC k for Kustom apps, SPC k c for Claude
+;; Keybindings: SPC k for Kustom apps, SPC k c for Claude, SPC k m for Monet
 (map! :leader
       :desc "Kustom apps" "k" nil  ; Clear any existing binding
       (:prefix ("k" . "kustom")
-       :desc "Claude" "c" claude-code-command-map))
+       :desc "Claude" "c" #'claude-code-transient
+       (:prefix ("m" . "monet")
+        :desc "Start server" "s" #'monet-start-server
+        :desc "Stop server" "k" #'monet-stop-server
+        :desc "Restart server" "r" #'monet-restart-server
+        :desc "Server status" "?" #'monet-status)))
 
 (provide 'claude)
 ;;; claude.el ends here
