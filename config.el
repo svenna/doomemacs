@@ -81,6 +81,9 @@
 ;; Markdown preview with Mermaid support
 (load! "modules/markdown-preview")
 
+;; Claude Code integration (SPC k c)
+(load! "modules/claude")
+
 ;; Enable X11 primary selection (highlight with mouse, paste with middle-click)
 (setq select-enable-primary t)           ; Enable primary selection
 (setq mouse-drag-copy-region t)          ; Copy to primary when selecting with mouse

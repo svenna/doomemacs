@@ -10,10 +10,28 @@ My personal Doom Emacs configuration.
 ├── init.el                # Doom modules selection
 ├── packages.el            # Package declarations
 └── modules/               # Custom modules
-    └── markdown-preview.el # Markdown preview with Mermaid support
+    ├── markdown-preview.el # Markdown preview with Mermaid support
+    └── claude.el          # Claude Code integration
 ```
 
 ## Features
+
+### Claude Code Integration
+- **AI-assisted development** with Claude directly in Emacs
+- **IDE protocol** support via Monet (selections, diagnostics, diffs)
+- **Terminal integration** with eat backend
+- **Custom namespace**: `SPC k` for custom apps, `SPC k c` for Claude commands
+- Full transient menu with all Claude commands
+
+**Key bindings:**
+- `SPC k c` - Open Claude command menu
+- Commands available: send region/buffer, fix errors, quick questions, etc.
+
+**Usage:**
+1. Use `SPC k c` to access Claude commands in Emacs
+2. Start a monet server with `C-c m s` (or `M-x monet-start-server`)
+3. In your terminal, use `/ide` command in Claude Code to connect to Emacs
+4. Claude can now see your selections, diagnostics, and show diffs
 
 ### Markdown Preview
 - **Dark theme** preview with proper contrast
@@ -36,6 +54,9 @@ My personal Doom Emacs configuration.
    ```bash
    # For markdown preview
    sudo apt install pandoc tidy
+
+   # For Claude Code integration
+   npm install -g @anthropic-ai/claude-code
    ```
 4. Sync Doom:
    ```bash
@@ -45,9 +66,14 @@ My personal Doom Emacs configuration.
 
 ## Requirements
 
+**For Markdown Preview:**
 - Pandoc (for markdown conversion)
 - Google Chrome (for preview)
 - tidy (for HTML validation)
+
+**For Claude Code:**
+- [Claude Code CLI](https://github.com/anthropics/claude-code) (`npm install -g @anthropic-ai/claude-code`)
+- Emacs 30.0+ (for claude-code.el and monet)
 
 ## Modules
 

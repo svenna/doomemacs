@@ -47,3 +47,11 @@
 ;; (unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
+
+;;; Custom Packages
+
+;; Claude Code integration
+(package! claude-code :recipe (:host github :repo "stevemolitor/claude-code.el"))
+(package! monet :recipe (:host github :repo "stevemolitor/monet"))
+(package! eat)
+(package! inheritenv :recipe (:host github :repo "purcell/inheritenv"))
