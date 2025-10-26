@@ -40,9 +40,11 @@ My personal Doom Emacs configuration.
 
 ### Markdown Preview
 - **Dark theme** preview with proper contrast
-- **Mermaid diagram** support
+- **Mermaid diagram** support in markdown files
+- **Standalone Mermaid** preview for `.mmd` files
 - **Live preview** in Chrome (`SPC m p`)
-- Uses Pandoc for conversion
+- Uses Pandoc for markdown conversion
+- Direct Mermaid.js rendering for `.mmd` files
 
 ### Editor Enhancements
 - **X11 Primary Selection**: Mouse highlight + middle-click paste

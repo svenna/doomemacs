@@ -21,10 +21,69 @@
                          (executable-find "google-chrome-stable"))
                      output-file))))
 
+(defun my/mermaid-preview ()
+  "Preview standalone Mermaid diagram (.mmd) in Chrome"
+  (interactive)
+  (let ((output-file "/tmp/mermaid-preview.html")
+        (mermaid-content (buffer-string)))
+    (with-temp-file output-file
+      (insert "<!DOCTYPE html>
+<html>
+<head>
+  <meta charset=\"utf-8\">
+  <title>Mermaid Preview</title>
+  <style>
+    * { box-sizing: border-box; }
+    html { background: #1e1e1e !important; }
+    body {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px;
+      background: #1e1e1e !important;
+      color: #d4d4d4;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    }
+    .mermaid {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <script type=\"module\">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+  </script>
+  <div class=\"mermaid\">
+"
+              mermaid-content
+              "
+  </div>
+</body>
+</html>"))
+    (unless (get-buffer-process "*mermaid-preview*")
+      (start-process "mermaid-preview" "*mermaid-preview*"
+                     (or (executable-find "google-chrome")
+                         (executable-find "google-chrome-stable"))
+                     output-file))))
+
+;; Simple major mode for .mmd files
+(define-derived-mode mermaid-mode fundamental-mode "Mermaid"
+  "Major mode for editing Mermaid diagram files (.mmd).")
+
+;; Associate .mmd files with mermaid-mode
+(add-to-list 'auto-mode-alist '("\\.mmd\\'" . mermaid-mode))
+
 ;; Keybinding: SPC m p in markdown mode
 (map! :map markdown-mode-map
       :localleader
       "p" #'my/markdown-preview)
+
+;; Keybinding: SPC m p in mermaid mode
+(map! :map mermaid-mode-map
+      :localleader
+      "p" #'my/mermaid-preview)
 
 (provide 'markdown-preview)
 ;;; markdown-preview.el ends here
