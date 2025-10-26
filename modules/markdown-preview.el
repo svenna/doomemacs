@@ -8,7 +8,7 @@
   (interactive)
   (let ((output-file "/tmp/markdown-preview.html"))
     (shell-command
-     (format "pandoc -s -f markdown -t html --metadata title=\"Preview\" %s -o %s && sed -i '/<\\/head>/i <style>*,*::before,*::after{box-sizing:border-box}html{background:#1e1e1e!important;color:#d4d4d4!important}body{max-width:1400px;margin:0 auto;padding:40px;font-size:16px;background:#1e1e1e!important;color:#d4d4d4!important;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;line-height:1.6}p,li,td,th,div:not(.mermaid){font-size:16px}h1,h2,h3,h4,h5,h6{color:#ffffff!important;font-weight:600;margin-top:24px;margin-bottom:16px;line-height:1.25}h1{font-size:32px;border-bottom:1px solid #404040;padding-bottom:0.3em}h2{font-size:24px;border-bottom:1px solid #404040;padding-bottom:0.3em}h3{font-size:20px}h4,h5,h6{font-size:16px}code,pre,pre *{font-size:14px}code{background:#0d1117!important;padding:0.2em 0.4em;border-radius:3px;font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;color:#7ee787!important}pre{background:#0d1117!important;padding:16px;border-radius:6px;overflow:auto;line-height:1.45;border:1px solid #30363d;color:#e6edf3!important}pre code{background:transparent!important;padding:0;color:#e6edf3!important}a{color:#58a6ff;text-decoration:none}a:hover{text-decoration:underline}table{border-collapse:collapse;margin:16px 0}table th,table td{border:1px solid #30363d;padding:6px 13px;font-size:16px}table th{background:#161b22;font-weight:600;color:#ffffff}table tr:nth-child(2n){background:#0d1117}strong{color:#ffffff;font-size:inherit}</style>' %s && sed -i 's/<body>/<body><script type=\"module\">import mermaid from \"https:\\/\\/cdn.jsdelivr.net\\/npm\\/mermaid@10\\/dist\\/mermaid.esm.min.mjs\";mermaid.initialize({startOnLoad:true,theme:\"dark\"});<\\/script>/' %s && sed -i 's/<pre class=\"mermaid\"><code>/<div class=\"mermaid\">/g' %s && sed -i '/<div class=\"mermaid\">/,/<\\/code><\\/pre>/ s/<\\/code><\\/pre>/<\\/div>/' %s"
+     (format "pandoc -s -f markdown -t html --metadata title=\"Preview\" %s -o %s && sed -i '/<\\/head>/i <style>*,*::before,*::after{box-sizing:border-box}html{background:#1e1e1e!important;color:#d4d4d4!important}body{max-width:1400px;margin:0 auto;padding:40px;font-size:16px;background:#1e1e1e!important;color:#d4d4d4!important;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;line-height:1.6}p,li,td,th,div:not(.mermaid){font-size:16px}h1,h2,h3,h4,h5,h6{color:#ffffff!important;font-weight:600;margin-top:24px;margin-bottom:16px;line-height:1.25}h1{font-size:32px;border-bottom:1px solid #404040;padding-bottom:0.3em}h2{font-size:24px;border-bottom:1px solid #404040;padding-bottom:0.3em}h3{font-size:20px}h4,h5,h6{font-size:16px}code,pre,pre *{font-size:14px}code{background:#0d1117!important;padding:0.2em 0.4em;border-radius:3px;font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;color:#7ee787!important}pre{background:#0d1117!important;padding:16px;border-radius:6px;overflow:auto;line-height:1.45;border:1px solid #30363d;color:#e6edf3!important}pre code{background:transparent!important;padding:0;color:#e6edf3!important}a{color:#58a6ff;text-decoration:none}a:hover{text-decoration:underline}table{border-collapse:collapse;margin:16px 0}table th,table td{border:1px solid #30363d;padding:6px 13px;font-size:16px}table th{background:#161b22;font-weight:600;color:#ffffff}table tr:nth-child(2n){background:#0d1117}strong{color:#ffffff;font-size:inherit}.mermaid-error{background:#8b0000!important;color:#fff!important;padding:40px!important;margin:20px 0!important;border:3px solid #ff0000!important;border-radius:8px!important;font-size:24px!important;font-weight:bold!important;text-align:center!important}</style>' %s && sed -i 's/<body>/<body><script type=\"module\">import mermaid from \"https:\\/\\/cdn.jsdelivr.net\\/npm\\/mermaid@10\\/dist\\/mermaid.esm.min.mjs\";mermaid.initialize({startOnLoad:true,theme:\"dark\"});window.addEventListener(\"load\",()=>{setTimeout(()=>{document.querySelectorAll(\".mermaid\").forEach(el=>{if(el.getAttribute(\"data-processed\")===\"true\"\\&\\&el.innerHTML.includes(\"Syntax error\")){el.classList.add(\"mermaid-error\");el.innerHTML=\"\\u26a0\\ufe0f MERMAID SYNTAX ERROR \\u26a0\\ufe0f<br><br>\"+el.textContent;}})},500)});<\\/script>/' %s && sed -i 's/<pre class=\"mermaid\"><code>/<div class=\"mermaid\">/g' %s && sed -i '/<div class=\"mermaid\">/,/<\\/code><\\/pre>/ s/<\\/code><\\/pre>/<\\/div>/' %s"
              (shell-quote-argument (buffer-file-name))
              output-file
              output-file
@@ -48,12 +48,33 @@
       justify-content: center;
       margin: 20px 0;
     }
+    .mermaid-error {
+      background: #8b0000 !important;
+      color: #fff !important;
+      padding: 40px !important;
+      margin: 20px 0 !important;
+      border: 3px solid #ff0000 !important;
+      border-radius: 8px !important;
+      font-size: 24px !important;
+      font-weight: bold !important;
+      text-align: center !important;
+    }
   </style>
 </head>
 <body>
   <script type=\"module\">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
     mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.querySelectorAll('.mermaid').forEach(el => {
+          if (el.getAttribute('data-processed') === 'true' && el.innerHTML.includes('Syntax error')) {
+            el.classList.add('mermaid-error');
+            el.innerHTML = '⚠️ MERMAID SYNTAX ERROR ⚠️<br><br>' + el.textContent;
+          }
+        });
+      }, 500);
+    });
   </script>
   <div class=\"mermaid\">
 "
