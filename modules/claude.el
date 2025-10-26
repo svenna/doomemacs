@@ -41,8 +41,7 @@
        (:prefix ("m" . "monet")
         :desc "Start server" "s" #'monet-start-server
         :desc "Stop server" "k" #'monet-stop-server
-        :desc "Restart server" "r" #'monet-restart-server
-        :desc "Server status" "?" #'monet-status)))
+        :desc "List sessions" "l" #'monet-list-sessions)))
 
 (provide 'claude)
 ;;; claude.el ends here

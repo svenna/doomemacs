@@ -29,8 +29,7 @@ My personal Doom Emacs configuration.
 - `SPC k m` - Monet server management
   - `SPC k m s` - Start monet server
   - `SPC k m k` - Stop monet server
-  - `SPC k m r` - Restart monet server
-  - `SPC k m ?` - Check server status
+  - `SPC k m l` - List active sessions
 
 **Usage:**
 1. Start monet server: `SPC k m s`
