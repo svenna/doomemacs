@@ -185,6 +185,22 @@ strong {
   color: #ffffff !important;
 }
 
+/* Force component and container text to be visible */
+.mermaid .component,
+.mermaid .container,
+.mermaid [class*="component"],
+.mermaid [class*="container"] {
+  fill: #0d1117 !important;
+  stroke: #58a6ff !important;
+}
+
+.mermaid .component text,
+.mermaid .container text,
+.mermaid [class*="component"] text,
+.mermaid [class*="container"] text {
+  fill: #ffffff !important;
+}
+
 .mermaid .edgeLabel,
 .mermaid .edgeLabel text,
 .mermaid .edgeLabel span,
