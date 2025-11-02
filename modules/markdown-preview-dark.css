@@ -179,6 +179,38 @@ strong {
   margin: 20px 0;
 }
 
+/* Mermaid edge labels (arrow text) - force all text to be white */
+.mermaid svg text {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+}
+
+.mermaid .edgeLabel,
+.mermaid .edgeLabel text,
+.mermaid .edgeLabel span,
+.mermaid .edgeLabel div,
+.mermaid text.edgeLabel {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  background-color: #0d1117 !important;
+}
+
+.mermaid .edgeLabel rect {
+  fill: #0d1117 !important;
+  opacity: 0.8 !important;
+}
+
+/* Force all foreignObject divs and spans to use white text */
+.mermaid foreignObject {
+  color: #ffffff !important;
+}
+
+.mermaid foreignObject div,
+.mermaid foreignObject span,
+.mermaid foreignObject p {
+  color: #ffffff !important;
+}
+
 /* Mermaid error styling */
 .mermaid-error {
   background: #8b0000 !important;
