@@ -3,6 +3,11 @@
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
 
+;; Sync PATH from shell (needed for GUI Emacs to find nvm, pyenv, etc.)
+(use-package! exec-path-from-shell
+  :config
+  (exec-path-from-shell-initialize))
+
 (add-to-list 'default-frame-alist '(width . 100))
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.

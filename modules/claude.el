@@ -1,15 +1,16 @@
-;;; claude.el --- Claude Code and Monet integration -*- lexical-binding: t; -*-
+;;; claude.el --- Claude AI integration -*- lexical-binding: t; -*-
 
-;; Claude Code Emacs integration for AI-assisted development
-;; Monet implements Claude Code IDE protocol via WebSocket
+;; Claude AI Emacs integration for AI-assisted development
 
 ;;; Commentary:
-;; This module integrates Claude Code CLI with Emacs through:
-;; - claude-code.el: Terminal-based Claude sessions
+;; This module integrates Claude AI with Emacs through:
+;; - claude-code.el: Terminal-based Claude sessions (CLI)
 ;; - monet: IDE protocol for selections, diagnostics, and diffs
+;; - efrit: Native Emacs Claude agent (API-based)
 ;;
 ;; Keybindings under SPC k (Kustom apps namespace):
-;; - SPC k c: Claude command map (transient menu)
+;; - SPC k c: Claude CLI (transient menu)
+;; - SPC k e: Efrit (native agent)
 
 ;;; Code:
 
@@ -33,11 +34,34 @@
   ;; Enable monet mode for IDE protocol
   (monet-mode 1))
 
-;; Keybindings: SPC k for Kustom apps, SPC k c for Claude, SPC k m for Monet
+;; Set efrit directory BEFORE package loads (efrit auto-initializes on load)
+(setq efrit-data-directory (expand-file-name ".efrit" doom-local-dir))
+
+(use-package! efrit
+  :commands (efrit-chat efrit-do efrit-agent efrit-doctor)
+  :config
+  ;; API key from environment variable ANTHROPIC_API_KEY
+
+  ;; Evil keybindings for efrit-mode
+  (map! :map efrit-mode-map
+        :n "RET" #'efrit-send-buffer-message
+        :i "S-<return>" #'efrit-insert-newline
+        :i "C-<return>" #'efrit-send-buffer-message
+        :n "q" #'quit-window)
+
+  ;; Set efrit buffers to insert state by default
+  (add-hook 'efrit-mode-hook #'evil-insert-state))
+
+;; Keybindings: SPC k for Kustom apps
 (map! :leader
       :desc "Kustom apps" "k" nil  ; Clear any existing binding
       (:prefix ("k" . "kustom")
-       :desc "Claude" "c" #'claude-code-transient
+       :desc "Claude CLI" "c" #'claude-code-transient
+       (:prefix ("e" . "efrit")
+        :desc "Chat" "c" #'efrit-chat
+        :desc "Do" "d" #'efrit-do
+        :desc "Agent" "a" #'efrit-agent
+        :desc "Doctor" "?" #'efrit-doctor)
        (:prefix ("m" . "monet")
         :desc "Start server" "s" #'monet-start-server
         :desc "Stop server" "k" #'monet-stop-server

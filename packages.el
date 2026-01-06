@@ -50,8 +50,14 @@
 
 ;;; Custom Packages
 
+;; Environment sync from shell
+(package! exec-path-from-shell)
+
 ;; Claude Code integration
 (package! claude-code :recipe (:host github :repo "stevemolitor/claude-code.el"))
 (package! monet :recipe (:host github :repo "stevemolitor/monet"))
 (package! eat)
 (package! inheritenv :recipe (:host github :repo "purcell/inheritenv"))
+
+;; Efrit - native Claude AI integration
+(package! efrit :recipe (:host github :repo "steveyegge/efrit" :files ("lisp/*.el" "lisp/**/*.el")))
