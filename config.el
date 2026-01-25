@@ -93,3 +93,6 @@
 (setq select-enable-primary t)           ; Enable primary selection
 (setq mouse-drag-copy-region t)          ; Copy to primary when selecting with mouse
 (setq mouse-yank-at-point nil)           ; Paste at mouse position (not at cursor)
+
+;; BtScript (BeaconTower-Script) major mode
+(load! "modules/btscript-mode")
