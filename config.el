@@ -83,8 +83,11 @@
       '((typescript "https://github.com/tree-sitter/tree-sitter-typescript" "typescript/src")
         (tsx        "https://github.com/tree-sitter/tree-sitter-typescript" "tsx/src")))
 
-;; Markdown preview with Mermaid support
+;; Mermaid mode for .mmd files (SPC m p in mermaid-mode)
 (load! "modules/markdown-preview")
+
+;; WYSIWYM mode for markdown (SPC m w, SPC m t v/o/r)
+(load! "modules/markdown-wysiwym")
 
 ;; Claude Code integration (SPC k c)
 (load! "modules/claude")

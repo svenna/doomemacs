@@ -179,10 +179,19 @@ strong {
   margin: 20px 0;
 }
 
-/* Mermaid edge labels (arrow text) - force all text to be white */
+/* Mermaid edge labels (arrow text) - force text to be white ONLY in Mermaid SVGs */
 .mermaid svg text {
   fill: #ffffff !important;
   color: #ffffff !important;
+}
+
+/* But don't affect code blocks or regular content */
+pre code,
+code,
+pre,
+.sourceCode {
+  fill: inherit !important;
+  color: inherit !important;
 }
 
 /* Force component and container text to be visible */

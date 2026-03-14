@@ -2,15 +2,15 @@
 
 ;; Copyright (C) 2024 BeaconTower
 ;; Author: BeaconTower
-;; Version: 0.1.0
+;; Version: 0.2.0
 ;; Package-Requires: ((emacs "26.1"))
-;; Keywords: languages, lisp
+;; Keywords: languages, scheme
 ;; URL: https://github.com/beacontower/btscript
 
 ;;; Commentary:
 
 ;; Major mode for editing BtScript files (.bts).
-;; BtScript is a Lisp-1 dialect for reactive dataflow definitions.
+;; BtScript is a Scheme dialect for reactive dataflow definitions.
 
 ;;; Code:
 
@@ -43,34 +43,52 @@
     (modify-syntax-entry ?! "_" table)
     ;; * is symbol constituent (for special vars)
     (modify-syntax-entry ?* "_" table)
+    ;; | is symbol constituent (for pipe-quoted symbols)
+    (modify-syntax-entry ?| "_" table)
     table)
   "Syntax table for `btscript-mode'.")
 
 ;; Font-lock keywords
 (defconst btscript-special-forms
-  '("flow" "inputs" "require" "trigger" "gate"
-    "cond" "when" "else"
-    "let" "define" "lambda" "def" "defmacro"
+  '("flow" "task" "function" "inputs" "outputs" "require" "trigger" "gate"
+    "cond" "when" "when-not" "unless" "else"
+    "let" "let*" "define" "lambda" "def" "defmacro" "defstruct" "defenum"
     "parallel" "branch" "join"
-    "route"
+    "route" "persist"
     "emit" "send-command"
-    "if" "do" "begin")
+    "if" "do" "begin"
+    "new" "array" "as" "->" ".")
   "BtScript special forms.")
 
 (defconst btscript-builtin-functions
   '("rolling-avg" "rolling-min" "rolling-max" "rolling-sum"
     "time-window" "latest" "threshold"
-    "avg" "sum" "max" "min" "sqrt"
+    "avg" "sum" "max" "min" "sqrt" "abs" "ceiling" "floor" "round" "mod"
     "and" "or" "not"
     "null?" "list?" "symbol?" "number?" "string?" "keyword?"
     "car" "cdr" "cons" "nth" "map" "filter"
-    "print" "string-append" "join")
+    "print" "string-append" "join"
+    ;; Type conversions
+    "string->int" "string->double" "string->float" "string->long"
+    "int->string" "int->double" "int->float" "int->long"
+    "double->string" "double->int" "double->float" "double->long"
+    "float->string" "float->int" "float->double" "float->long"
+    "long->string" "long->int" "long->double" "long->float"
+    ;; Array operations
+    "array-avg" "array-sum" "array-min" "array-max" "array-count"
+    "array-first" "array-last" "array-contains" "array-filter" "array-map"
+    "array-sort" "array-reverse" "array-take" "array-skip" "array-distinct"
+    "array-flat-map" "array-any" "array-all" "array-append"
+    ;; Map operations
+    "map-get" "map-keys" "map-values" "map-contains-key" "map-count"
+    "map-set" "map-remove" "map-merge")
   "BtScript built-in functions.")
 
 (defconst btscript-mode-keywords
-  '(":id" ":as" ":window" ":input" ":value" ":limit"
-    ":on-any" ":zip" ":combine-latest" ":on-timer" ":timer" ":on-change"
-    ":interval" ":min" ":max" ":temp" ":pressure" ":rated-power")
+  '("id:" "as:" "window:" "input:" "value:" "limit:"
+    "on-any:" "zip:" "combine-latest:" "on-timer:" "timer:" "on-change:"
+    "interval:" "min:" "max:" "version:" "type:" "output:" "generic:"
+    "constraint:" "default:" "optional:" "persist:" "on:")
   "BtScript keywords (named parameters).")
 
 (defconst btscript-constants
@@ -82,8 +100,11 @@
     ;; Comments (handled by syntax table, but ensure highlighting)
     (";.*$" . font-lock-comment-face)
 
-    ;; Keywords (:keyword)
-    (":[a-zA-Z][a-zA-Z0-9-]*" . font-lock-builtin-face)
+    ;; SRFI-88 keywords (word:)
+    ("\\b[a-zA-Z][a-zA-Z0-9-]*:" . font-lock-builtin-face)
+
+    ;; Pipe-quoted symbols |...|
+    ("|[^|]+|" . font-lock-type-face)
 
     ;; Special forms
     (,(concat "(" (regexp-opt btscript-special-forms 'symbols))
@@ -113,12 +134,16 @@
     ("(def\\s-+\\([a-zA-Z][a-zA-Z0-9-?!*]*\\)"
      (1 font-lock-variable-name-face))
 
-    ;; Flow id
-    ("(flow\\s-+:id\\s-+\\([a-zA-Z][a-zA-Z0-9-]*\\)"
+    ;; defstruct/defenum names
+    ("(def\\(?:struct\\|enum\\)\\s-+\\([a-zA-Z][a-zA-Z0-9-?!*]*\\)"
+     (1 font-lock-type-face))
+
+    ;; Flow/task/function id
+    ("(\\(?:flow\\|task\\|function\\)\\s-+id:\\s-+\\([a-zA-Z][a-zA-Z0-9-]*\\)"
      (1 font-lock-type-face))
 
     ;; Branch names
-    (":as\\s-+\\([a-zA-Z][a-zA-Z0-9-]*\\)"
+    ("as:\\s-+\\([a-zA-Z][a-zA-Z0-9-]*\\)"
      (1 font-lock-variable-name-face))
 
     ;; Input bindings: (name "path")
@@ -130,7 +155,7 @@
     ("\\b[0-9]+\\(?:\\.[0-9]+\\)?\\b" . font-lock-constant-face)
 
     ;; Operators
-    (,(regexp-opt '("+" "-" "*" "/" ">" "<" ">=" "<=" "=") 'symbols)
+    (,(regexp-opt '("+" "-" "*" "/" "%" ">" "<" ">=" "<=" "=") 'symbols)
      . font-lock-builtin-face)
 
     ;; Special variables (*name*)
@@ -184,8 +209,12 @@
 
 ;; Imenu support
 (defvar btscript-imenu-generic-expression
-  '(("Flows" "^(flow\\s-+:id\\s-+\\([a-zA-Z][a-zA-Z0-9-]*\\)" 1)
-    ("Functions" "^(def\\(?:ine\\)?\\s-+(\\([a-zA-Z][a-zA-Z0-9-?!*]*\\)" 1)
+  '(("Flows" "^(flow\\s-+id:\\s-+\\([a-zA-Z][a-zA-Z0-9-]*\\)" 1)
+    ("Tasks" "^(task\\s-+id:\\s-+\\([a-zA-Z][a-zA-Z0-9-]*\\)" 1)
+    ("Functions" "^(function\\s-+id:\\s-+\\([a-zA-Z][a-zA-Z0-9-]*\\)" 1)
+    ("Structs" "^(defstruct\\s-+\\([a-zA-Z][a-zA-Z0-9-?!*]*\\)" 1)
+    ("Enums" "^(defenum\\s-+\\([a-zA-Z][a-zA-Z0-9-?!*]*\\)" 1)
+    ("Defines" "^(def\\(?:ine\\)?\\s-+(\\([a-zA-Z][a-zA-Z0-9-?!*]*\\)" 1)
     ("Variables" "^(def\\s-+\\([a-zA-Z][a-zA-Z0-9-?!*]*\\)\\s-+[^(]" 1)
     ("Macros" "^(defmacro\\s-+\\([a-zA-Z][a-zA-Z0-9-?!*]*\\)" 1))
   "Imenu expressions for BtScript.")

@@ -61,3 +61,7 @@
 
 ;; Efrit - native Claude AI integration
 (package! efrit :recipe (:host github :repo "steveyegge/efrit" :files ("lisp/*.el" "lisp/**/*.el")))
+
+;; WYSIWYM mode for markdown
+(package! valign)
+(package! olivetti)
