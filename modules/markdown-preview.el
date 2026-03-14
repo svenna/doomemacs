@@ -6,6 +6,10 @@
 
 ;;; Code:
 
+(defvar my/mermaid-puppeteer-config
+  (expand-file-name "~/.puppeteerrc.json")
+  "Path to puppeteer config for mmdc (needed for sandbox workaround).")
+
 (defvar-local my/mermaid-inline-overlay nil
   "Overlay for inline mermaid preview in the buffer.")
 
@@ -16,10 +20,12 @@
   (let ((tmp-in (make-temp-file "mermaid-" nil ".mmd"))
         (tmp-out (make-temp-file "mermaid-" nil ".png")))
     (write-region (point-min) (point-max) tmp-in nil 'quiet)
-    (if (= 0 (call-process "mmdc" nil nil nil
+    (if (= 0 (apply #'call-process "mmdc" nil nil nil
                             "-i" tmp-in "-o" tmp-out
                             "-t" "dark" "-b" "transparent"
-                            "-w" "1200"))
+                            "-w" "1200"
+                            (when (file-exists-p my/mermaid-puppeteer-config)
+                              (list "-p" my/mermaid-puppeteer-config))))
         (progn (delete-file tmp-in) tmp-out)
       (delete-file tmp-in)
       (delete-file tmp-out)

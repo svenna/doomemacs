@@ -86,6 +86,22 @@
 ;; Mermaid mode for .mmd files (SPC m p in mermaid-mode)
 (load! "modules/markdown-preview")
 
+;; WYSIWYM packages
+(use-package! valign
+  :commands valign-mode
+  :config
+  (setq valign-fancy-bar t))
+
+(use-package! olivetti
+  :commands olivetti-mode
+  :config
+  (setq olivetti-body-width 80))
+
+(use-package! adaptive-wrap
+  :commands adaptive-wrap-prefix-mode
+  :config
+  (setq adaptive-wrap-extra-indent 0))
+
 ;; WYSIWYM mode for markdown (SPC m w, SPC m t v/o/r)
 (load! "modules/markdown-wysiwym")
 

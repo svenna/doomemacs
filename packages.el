@@ -65,3 +65,4 @@
 ;; WYSIWYM mode for markdown
 (package! valign)
 (package! olivetti)
+(package! adaptive-wrap)
