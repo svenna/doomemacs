@@ -102,6 +102,9 @@
   :config
   (setq adaptive-wrap-extra-indent 0))
 
+;; Generic sliced image display (used by markdown-wysiwym)
+(load! "modules/image-slice-display")
+
 ;; WYSIWYM mode for markdown (SPC m w, SPC m t v/o/r)
 (load! "modules/markdown-wysiwym")
 

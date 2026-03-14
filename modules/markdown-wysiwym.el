@@ -15,10 +15,12 @@
 
 ;;; Code:
 
+(require 'image-slice-display)
+
 ;; --- Mermaid overlay rendering ---
 
-(defvar-local my/mermaid-overlays nil
-  "List of overlays displaying rendered mermaid diagrams.")
+(defvar-local my/mermaid-slice-groups nil
+  "List of `image-slice-display-group' structs for rendered mermaid diagrams.")
 
 (defun my/mermaid-render-all ()
   "Render all mermaid code blocks as sliced inline image overlays using mmdc."
@@ -48,57 +50,23 @@
                                       (when (and (boundp 'my/mermaid-puppeteer-config)
                                                  (file-exists-p my/mermaid-puppeteer-config))
                                         (list "-p" my/mermaid-puppeteer-config))))
-                  (my/mermaid--display-sliced block-start block-end tmp-out win-width)
+                  ;; Delegate sliced display to the generic library and store
+                  ;; the returned group struct for later cleanup.
+                  (let ((group (image-slice-display-show
+                                block-start block-end tmp-out win-width)))
+                    (push group my/mermaid-slice-groups))
                 (message "mmdc failed at line %d: %s"
                          (line-number-at-pos block-start)
                          (with-current-buffer err-buf (buffer-string))))
               (kill-buffer err-buf))
             (delete-file tmp-in)))))))
 
-(defun my/mermaid--display-sliced (block-start block-end image-file display-width)
-  "Display IMAGE-FILE as sliced overlays on existing mermaid block lines.
-Uses one overlay per buffer line. No buffer modification needed since the
-mermaid block already has enough lines."
-  (let* ((img (create-image image-file 'png nil :width display-width))
-         (img-size (image-size img t))
-         (img-h (cdr img-size))
-         (font-h (default-font-height))
-         (rows (max 1 (round (/ (float img-h) font-h))))
-         (dy (/ 1.0001 rows))
-         (lines '()))
-    ;; Collect all line regions (bol to eol, not covering newline)
-    (save-excursion
-      (goto-char block-start)
-      (while (< (point) block-end)
-        (push (cons (line-beginning-position) (line-end-position)) lines)
-        (forward-line 1)))
-    (setq lines (nreverse lines))
-    (let* ((num-lines (length lines))
-           (rows (min rows num-lines)))
-      ;; Overlay each line with one slice (covering newline to avoid gaps)
-      (dotimes (i rows)
-        (let* ((line (nth i lines))
-               (ov (make-overlay (car line) (cdr line))))
-          (overlay-put ov 'display
-                       (list (list 'slice 0 (* i dy) 1.0001 dy) img))
-          (overlay-put ov 'face 'default)
-          (overlay-put ov 'my/mermaid t)
-          (push ov my/mermaid-overlays)))
-      ;; Hide excess lines individually so Evil can traverse
-      (when (> num-lines rows)
-        (dolist (line (nthcdr rows lines))
-          (let ((ov (make-overlay (car line) (cdr line))))
-            (overlay-put ov 'display "")
-            (overlay-put ov 'my/mermaid t)
-            (push ov my/mermaid-overlays)))))))
-
 (defun my/mermaid-clear-all ()
-  "Remove all mermaid image overlays."
+  "Remove all mermaid image overlays and restore buffer state."
   (interactive)
-  (dolist (ov my/mermaid-overlays)
-    (when (overlay-buffer ov)
-      (delete-overlay ov)))
-  (setq my/mermaid-overlays nil))
+  (dolist (group my/mermaid-slice-groups)
+    (image-slice-display-remove group))
+  (setq my/mermaid-slice-groups nil))
 
 (defvar-local my/mermaid--hl-line-was-on nil
   "Whether hl-line-mode was active before mermaid render.")
@@ -109,7 +77,7 @@ mermaid block already has enough lines."
 (defun my/markdown-toggle-mermaid ()
   "Toggle mermaid diagram rendering overlays on/off."
   (interactive)
-  (if my/mermaid-overlays
+  (if my/mermaid-slice-groups
       (progn
         (my/mermaid-clear-all)
         (when my/mermaid--hl-line-was-on
@@ -119,7 +87,7 @@ mermaid block already has enough lines."
     (when (bound-and-true-p hl-line-mode)
       (hl-line-mode -1))
     (setq my/mermaid--saved-line-spacing line-spacing)
-    (setq line-spacing 0)
+    (setq line-spacing nil)
     (my/mermaid-render-all)))
 
 (defun my/mermaid-view-at-point ()
