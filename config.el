@@ -118,3 +118,26 @@
 
 ;; BtScript (BeaconTower-Script) major mode
 (load! "modules/btscript-mode")
+
+;; Kotlin: use JetBrains' official kotlin-lsp (~/software/kotlin-lsp, wrapper in
+;; ~/.local/bin) instead of the community fwcd/kotlin-language-server that Doom's
+;; lang/kotlin module registers by default. The JetBrains server handles large
+;; Gradle/Compose projects (e.g. the E.ON Koll/Hemflex app) far better.
+(after! lsp-mode
+  ;; Don't let lsp-mode offer to download/run the community server.
+  (add-to-list 'lsp-disabled-clients 'kotlin-ls)
+  (add-to-list 'lsp-disabled-clients 'kotlin-language-server)
+
+  (defvar +kotlin-lsp-executable
+    (or (executable-find "kotlin-lsp")
+        (expand-file-name "~/.local/bin/kotlin-lsp"))
+    "Path to the JetBrains kotlin-lsp wrapper (stdio mode).")
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection
+                     (lambda () (list +kotlin-lsp-executable "--stdio")))
+    :activation-fn (lsp-activate-on "kotlin")
+    :priority 1                         ; beat the community client if both match
+    :server-id 'jetbrains-kotlin-lsp
+    :major-modes '(kotlin-mode kotlin-ts-mode))))
